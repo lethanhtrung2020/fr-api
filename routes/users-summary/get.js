@@ -2,11 +2,10 @@ import knex from '@api/database'
 import { status, residentPrefix } from '@constants/user'
 
 export default async (req, res) => {
-    const { deviceIds, endDate } = req.query
+    const { deviceIds } = req.query
 
     let condition = 'WHERE `rank`=1'
     if (deviceIds.length) condition = condition + ` AND sn IN (${deviceIds.split(',').map(id => "'" + id + "'").join(",")})`
-    if (endDate) condition = condition + ` AND updatedAt > '${endDate} 00:00:00' AND updatedAt < '${endDate} 23:59:59'`
 
     const totalResidentsCondition = `
         AND userId NOT LIKE '${residentPrefix}%';
