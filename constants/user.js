@@ -1,6 +1,6 @@
-export const type  = {
-    inside: 'InSide',
-    outside: 'OutSide'
+export const status  = {
+    inside: 'inside',
+    outside: 'outside'
 }
 
 export const residentPrefix = "DL_"
