@@ -61,7 +61,7 @@ function getVisitorSummary({ deviceIds, dataPointType, endDate, dataPointNumber 
             COUNT(*) as total, 
             sum(case when bodyTemperature>=35.5 AND bodyTemperature <=37.5 then 1 else 0 end) as no_pass,
             sum(case when bodyTemperature<35.5 OR bodyTemperature >37.5 then 1 else 0 end) as no_failed
-        FROM first.detection_logs
+        FROM detection_logs
         WHERE ${condition}
         GROUP BY ${groupBy}
         ORDER BY detectionTime ASC;

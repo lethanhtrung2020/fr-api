@@ -61,7 +61,7 @@ function getVisitorSummary({ deviceIds, dataPointType, endDate, dataPointNumber 
             COUNT(*) as total, 
             sum(case when type = 'STRANGER' then 1 else 0 end) as no_stranger,
             sum(case when type = 'REGISTERED_USER' then 1 else 0 end) as no_user
-        FROM first.detection_logs
+        FROM detection_logs
         WHERE ${condition}
         GROUP BY ${groupBy}
         ORDER BY detectionTime ASC;
