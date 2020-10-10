@@ -41,9 +41,9 @@ function getVisitorSummary({ deviceIds, dataPointType, endDate, dataPointNumber 
         groupBy = "DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(detectionTime)), '%Y-%m-%d')"
     }
     if (dataPointType === 'weekly') {
-        labelColumn = "WEEK(detectionTime) as label";
+        labelColumn = "WEEK(detectionTime, 1) as label";
         interval = 'WEEK'
-        groupBy = "WEEK(detectionTime)"
+        groupBy = "WEEK(detectionTime, 1)"
     }
     if (dataPointType === 'monthly') {
         labelColumn = "MONTHNAME(detectionTime) as label";
@@ -76,6 +76,7 @@ function formatVisitorSummary(summary, { dataPointType, endDate, dataPointNumber
         registered: [],
         guest: []
     }
+    console.log(summary)
     if (dataPointType === "daily") {
         for (let i = 0; i < dataPointNumber; i++) {
             const present = new Date(endDate)
@@ -136,6 +137,7 @@ function formatVisitorSummary(summary, { dataPointType, endDate, dataPointNumber
         for (let i = 0; i < dataPointNumber; i++) {
             const currentDate = new Date(endDate)
             const weekKey = getWeek(subWeeks(currentDate, i))
+            console.log(139, weekKey);
             const weeklyRecord = summary.find(record => record.label === weekKey)
 
             if (weeklyRecord) {
