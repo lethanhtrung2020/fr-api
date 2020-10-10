@@ -57,10 +57,13 @@ function getVisitorSummary({ deviceIds, dataPointType, endDate, dataPointNumber 
     if (endDate && dataPointNumber) condition = condition + ` AND detectionTime >= DATE_SUB('${endDate}', INTERVAL ${dataPointNumber} ${interval})`
 
     return knex.raw(`
-        SELECT ${labelColumn}, 
-            COUNT(*) as total, 
-            sum(case when bodyTemperature>=35.5 AND bodyTemperature <=37.5 then 1 else 0 end) as no_pass,
-            sum(case when bodyTemperature<35.5 OR bodyTemperature >37.5 then 1 else 0 end) as no_failed
+        SELECT ${labelColumn},
+            sum(case when type = 'STRANGER' AND bodyTemperature>=35.5 AND bodyTemperature <=37.5 then 1 else 0 end) as no_stranger_pass,
+            sum(case when type = 'STRANGER' AND (bodyTemperature<35.5 OR bodyTemperature >37.5) then 1 else 0 end) as no_stranger_fail,
+            sum(case when type = 'STRANGER' then 1 else 0 end) as total_stranger,
+            sum(case when type = 'REGISTERED_USER' AND bodyTemperature>=35.5 AND bodyTemperature <=37.5 then 1 else 0 end) as no_user_pass,
+            sum(case when type = 'REGISTERED_USER' AND (bodyTemperature<35.5 OR bodyTemperature >37.5) then 1 else 0 end) as no_user_fail,
+            sum(case when type = 'REGISTERED_USER' then 1 else 0 end) as total_user
         FROM detection_logs
         WHERE ${condition}
         GROUP BY ${groupBy}
@@ -69,48 +72,121 @@ function getVisitorSummary({ deviceIds, dataPointType, endDate, dataPointNumber 
 }
 
 function formatVisitorSummary(summary, { dataPointType, endDate, dataPointNumber }) {
+    let resultSummary = {
+        registered: [],
+        guest: []
+    }
     if (dataPointType === "daily") {
         for (let i = 0; i < dataPointNumber; i++) {
             const present = new Date(endDate)
             const dateKey = format(subDays(present, i), "yyyy-MM-dd")
-            const isDateRecordExist = summary.find(record => record.label === dateKey)
-            if (isDateRecordExist) continue
-
-            summary = [
-                ...summary,
-                {
-                    label: dateKey,
-                    no_pass: 0,
-                    no_failed: 0,
-                    total: 0
-                }
-            ]
+            const dateRecord = summary.find(record => record.label === dateKey)
+            if (dateRecord) {
+                resultSummary.registered = [
+                    ...resultSummary.registered,
+                    {
+                        label: dateKey,
+                        passed: dateRecord.no_user_pass,
+                        failed: dateRecord.no_user_fail,
+                        total: dateRecord.total_user
+                    }
+                ]
+                resultSummary.guest = [
+                    ...resultSummary.guest,
+                    {
+                        label: dateKey,
+                        passed: dateRecord.no_stranger_pass,
+                        failed: dateRecord.no_stranger_fail,
+                        total: dateRecord.total_stranger
+                    }
+                ]
+            } else {
+                resultSummary.registered = [
+                    ...resultSummary.registered,
+                    {
+                        label: dateKey,
+                        passed: 0,
+                        failed: 0,
+                        total: 0
+                    }
+                ]
+                resultSummary.guest = [
+                    ...resultSummary.guest,
+                    {
+                        label: dateKey,
+                        passed: 0,
+                        failed: 0,
+                        total: 0
+                    }
+                ]
+            }
         }
 
-        return summary.sort(function (a, b) {
+        resultSummary.registered.sort(function (a, b) {
             return new Date(a.label) - new Date(b.label);
         });
+        resultSummary.guest.sort(function (a, b) {
+            return new Date(a.label) - new Date(b.label);
+        });
+
+        return resultSummary
     }
+
     if (dataPointType === "weekly") {
         for (let i = 0; i < dataPointNumber; i++) {
             const currentDate = new Date(endDate)
             const weekKey = getWeek(subWeeks(currentDate, i))
-            const isWeekRecordExist = summary.find(record => record.label === weekKey)
-            if (isWeekRecordExist) continue
+            const weeklyRecord = summary.find(record => record.label === weekKey)
 
-            summary = [
-                ...summary,
-                {
-                    label: weekKey,
-                    no_pass: 0,
-                    no_failed: 0,
-                    total: 0
-                }
-            ]
+            if (weeklyRecord) {
+                resultSummary.registered = [
+                    ...resultSummary.registered,
+                    {
+                        label: weekKey,
+                        passed: weeklyRecord.no_user_pass,
+                        failed: weeklyRecord.no_user_fail,
+                        total: weeklyRecord.total_user
+                    }
+                ]
+                resultSummary.guest = [
+                    ...resultSummary.guest,
+                    {
+                        label: weekKey,
+                        passed: weeklyRecord.no_stranger_pass,
+                        failed: weeklyRecord.no_stranger_fail,
+                        total: weeklyRecord.total_stranger
+                    }
+                ]
+            } else {
+                resultSummary.registered = [
+                    ...resultSummary.registered,
+                    {
+                        label: weekKey,
+                        passed: 0,
+                        failed: 0,
+                        total: 0
+                    }
+                ]
+                resultSummary.guest = [
+                    ...resultSummary.guest,
+                    {
+                        label: weekKey,
+                        passed: 0,
+                        failed: 0,
+                        total: 0
+                    }
+                ]
+            }
         }
-        return summary.sort(function (a, b) {
-            return a.label - b.label;
+
+        resultSummary.registered.sort(function (a, b) {
+            return new Date(a.label) - new Date(b.label);
         });
+        resultSummary.guest.sort(function (a, b) {
+            return new Date(a.label) - new Date(b.label);
+        });
+
+        return resultSummary
     }
     if (dataPointType === "monthly") {
         for (let i = 0; i < dataPointNumber; i++) {
@@ -118,30 +194,72 @@ function formatVisitorSummary(summary, { dataPointType, endDate, dataPointNumber
             const monthKey = getMonth(subMonths(currentDate, i)) + 1
             const index = summary.findIndex(record => record.label === months[monthKey])
             if (index > -1) {
-                summary[index].monthKey = monthKey
+                resultSummary.registered = [
+                    ...resultSummary.registered,
+                    {
+                        label: summary[index].label,
+                        monthKey,
+                        passed: summary[index].no_user_pass,
+                        failed: summary[index].no_user_fail,
+                        total: summary[index].total_user
+                    }
+                ]
+                resultSummary.guest = [
+                    ...resultSummary.guest,
+                    {
+                        label: summary[index].label,
+                        monthKey,
+                        passed: summary[index].no_stranger_pass,
+                        failed: summary[index].no_stranger_fail,
+                        total: summary[index].total_stranger
+                    }
+                ]
                 continue
+            } else {
+                resultSummary.registered = [
+                    ...resultSummary.registered,
+                    {
+                        label: months[monthKey],
+                        monthKey,
+                        passed: 0,
+                        failed: 0,
+                        total: 0
+                    }
+                ]
+                resultSummary.guest = [
+                    ...resultSummary.guest,
+                    {
+                        label: months[monthKey],
+                        monthKey,
+                        passed: 0,
+                        failed: 0,
+                        total: 0
+                    }
+                ]
             }
-
-            summary = [
-                ...summary,
-                {
-                    label: months[monthKey],
-                    monthKey,
-                    no_pass: 0,
-                    no_failed: 0,
-                    total: 0
-                }
-            ]
         }
-        return summary.sort(function (a, b) {
+
+        resultSummary.registered = resultSummary.registered.sort(function (a, b) {
             return a.monthKey - b.monthKey;
-        }).map(({ label, no_pass, no_failed, total }) => {
+        }).map(({ label, passed, failed, total }) => {
             return {
                 label: label.substring(0, 3),
-                no_pass,
-                no_failed,
-                total,
+                passed,
+                failed,
+                total
             }
         });
+        resultSummary.guest = resultSummary.guest.sort(function (a, b) {
+            return a.monthKey - b.monthKey;
+        }).map(({ label, passed, failed, total }) => {
+            return {
+                label: label.substring(0, 3),
+                passed,
+                failed,
+                total
+            }
+        });
+
+        return resultSummary
     }
 }
