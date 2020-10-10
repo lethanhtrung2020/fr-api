@@ -54,7 +54,7 @@ function getVisitorSummary({ deviceIds, dataPointType, endDate, dataPointNumber 
     let condition = "true"
     if (deviceIds && deviceIds.length) condition = condition + ` AND fromDevice IN (${deviceIds.split(',').map(id => "'" + id + "'").join(",")})`
     if (endDate) condition = condition + ` AND detectionTime <= "${endDate} 23:59:59"`
-    if (endDate && dataPointNumber) condition = condition + ` AND detectionTime >= DATE_SUB('${endDate}', INTERVAL ${dataPointNumber} ${interval})`
+    if (endDate && dataPointNumber) condition = condition + ` AND detectionTime >= DATE_SUB('${endDate} 23:59:59', INTERVAL ${dataPointNumber} ${interval})`
 
     return knex.raw(`
         SELECT ${labelColumn},
@@ -76,7 +76,6 @@ function formatVisitorSummary(summary, { dataPointType, endDate, dataPointNumber
         registered: [],
         guest: []
     }
-    console.log(summary)
     if (dataPointType === "daily") {
         for (let i = 0; i < dataPointNumber; i++) {
             const present = new Date(endDate)
@@ -137,7 +136,6 @@ function formatVisitorSummary(summary, { dataPointType, endDate, dataPointNumber
         for (let i = 0; i < dataPointNumber; i++) {
             const currentDate = new Date(endDate)
             const weekKey = getWeek(subWeeks(currentDate, i))
-            console.log(139, weekKey);
             const weeklyRecord = summary.find(record => record.label === weekKey)
 
             if (weeklyRecord) {
