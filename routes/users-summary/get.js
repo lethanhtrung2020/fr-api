@@ -1,24 +1,24 @@
 import knex from '@api/database'
-import { status, residentPrefix } from '@constants/user'
+import { status, residentPrefix, guestPrefix } from '@constants/user'
 
 export default async (req, res) => {
     const { deviceIds } = req.query
 
     let condition = 'WHERE `rank`=1'
-    if (deviceIds.length) condition = condition + ` AND sn IN (${deviceIds.split(',').map(id => "'" + id + "'").join(",")})`
+    if (deviceIds && deviceIds.length) condition = condition + ` AND sn IN (${deviceIds.split(',').map(id => "'" + id + "'").join(",")})`
 
     const totalResidentsCondition = `
-        AND userId NOT LIKE '${residentPrefix}%';
+        AND card_id LIKE '${residentPrefix}%';
     `
     const presentPeoplesCondition = `
         AND status='${status.inside}'
     `
     const presentResidentsCondition = `
-        AND userId NOT LIKE '${residentPrefix}%' 
+        AND card_id LIKE '${residentPrefix}%' 
         AND status='${status.inside}'
     `
     const presentGuestsCondition = `
-        AND userId LIKE '${residentPrefix}%' 
+        AND card_id LIKE '${guestPrefix}%' 
         AND status='${status.inside}'
     `
 
@@ -33,7 +33,7 @@ export default async (req, res) => {
 function getUniqQuery(column) {
     return `
         WITH user_sort_by_time AS (
-            SELECT *, ROW_NUMBER() OVER (PARTITION BY userId ORDER BY updatedAt DESC) AS 'rank'
+            SELECT *, ROW_NUMBER() OVER (PARTITION BY card_id ORDER BY updatedAt DESC) AS 'rank'
             FROM users AS user
         )
         SELECT COUNT(*) as ${column}

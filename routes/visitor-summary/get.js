@@ -1,5 +1,5 @@
 import knex from '@api/database'
-import { format, subDays, getWeek, subWeeks, getMonth, subMonths } from 'date-fns'
+import { format, addDays, getWeek, addWeeks, getMonth, addMonths } from 'date-fns'
 import { BadRequestError } from '@helpers/errors'
 
 const months = {
@@ -54,8 +54,8 @@ function getVisitorSummary({ deviceIds, dataPointType, endDate, dataPointNumber 
 
     let condition = "true"
     if (deviceIds && deviceIds.length) condition = condition + ` AND fromDevice IN (${deviceIds.split(',').map(id => "'" + id + "'").join(",")})`
-    if (endDate) condition = condition + ` AND detectionTime <= "${endDate} 23:59:59"`
-    if (endDate && dataPointNumber) condition = condition + ` AND detectionTime >= DATE_SUB('${endDate}', INTERVAL ${dataPointNumber} ${interval})`
+    if (endDate) condition = condition + ` AND detectionTime >= "${endDate} 00:00:00"`
+    if (endDate && dataPointNumber) condition = condition + ` AND detectionTime <= DATE_ADD('${endDate}', INTERVAL ${dataPointNumber} ${interval})`
 
     return knex.raw(`
         SELECT ${labelColumn}, 
@@ -73,7 +73,7 @@ function formatVisitorSummary(summary, { dataPointType, endDate, dataPointNumber
     if (dataPointType === "daily") {
         for (let i = 0; i < dataPointNumber; i++) {
             const present = new Date(endDate)
-            const dateKey = format(subDays(present, i), "yyyy-MM-dd")
+            const dateKey = format(addDays(present, i), "yyyy-MM-dd")
             const isDateRecordExist = summary.find(record => record.label === dateKey)
             if (isDateRecordExist) continue
 
@@ -95,7 +95,7 @@ function formatVisitorSummary(summary, { dataPointType, endDate, dataPointNumber
     if (dataPointType === "weekly") {
         for (let i = 0; i < dataPointNumber; i++) {
             const currentDate = new Date(endDate)
-            const weekKey = getWeek(subWeeks(currentDate, i))
+            const weekKey = getWeek(addWeeks(currentDate, i))
             const isWeekRecordExist = summary.find(record => record.label === weekKey)
             if (isWeekRecordExist) continue
 
@@ -116,7 +116,7 @@ function formatVisitorSummary(summary, { dataPointType, endDate, dataPointNumber
     if (dataPointType === "monthly") {
         for (let i = 0; i < dataPointNumber; i++) {
             const currentDate = new Date(endDate)
-            const monthKey = getMonth(subMonths(currentDate, i)) + 1
+            const monthKey = getMonth(addMonths(currentDate, i)) + 1
             const index = summary.findIndex(record => record.label === months[monthKey])
             if (index > -1) {
                 summary[index].monthKey = monthKey
