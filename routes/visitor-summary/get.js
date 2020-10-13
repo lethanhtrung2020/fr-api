@@ -20,6 +20,7 @@ const months = {
 export default async (req, res) => {
     validateParams(req.query)
     const [visitorSummary] = await getVisitorSummary(req.query)
+    console.log(23, visitorSummary);
     const formatSummary = formatVisitorSummary(visitorSummary, req.query)
 
     return res.success(formatSummary)
