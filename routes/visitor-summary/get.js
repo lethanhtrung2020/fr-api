@@ -20,7 +20,6 @@ const months = {
 export default async (req, res) => {
     validateParams(req.query)
     const [visitorSummary] = await getVisitorSummary(req.query)
-    console.log(23, visitorSummary);
     const formatSummary = formatVisitorSummary(visitorSummary, req.query)
 
     return res.success(formatSummary)
@@ -47,7 +46,7 @@ function getVisitorSummary({ deviceIds, dataPointType, endDate, dataPointNumber 
         groupBy = "WEEK(detectionTime)"
     }
     if (dataPointType === 'monthly') {
-        labelColumn = "MONTHNAME(detectionTime) as label";
+        labelColumn = "MONTHNAME(detectionTime) as label, MONTH(detectionTime) as monthKey";
         interval = 'MONTH'
         groupBy = "MONTHNAME(detectionTime)"
     }
@@ -93,50 +92,57 @@ function formatVisitorSummary(summary, { dataPointType, endDate, dataPointNumber
         });
     }
     if (dataPointType === "weekly") {
+        let resultByWeek = [];
         for (let i = 0; i < dataPointNumber; i++) {
             const currentDate = new Date(endDate)
             const weekKey = getWeek(addWeeks(currentDate, i))
-            const isWeekRecordExist = summary.find(record => record.label === weekKey)
-            if (isWeekRecordExist) continue
-
-            summary = [
-                ...summary,
+            const existWeekRecord = summary.find(record => record.label === weekKey)
+            if (existWeekRecord) {
+                const { label, no_stranger, no_user, total } = existWeekRecord
+                resultByWeek = [...resultByWeek, {
+                    label,
+                    total,
+                    no_stranger,
+                    no_user
+                }]
+            } else {
+                resultByWeek = [...resultByWeek,
                 {
                     label: weekKey,
                     no_stranger: 0,
                     no_user: 0,
                     total: 0
-                }
-            ]
+                }]
+            }
+
         }
-        return summary.sort(function (a, b) {
-            return a.label - b.label;
-        });
+        return resultByWeek
     }
     if (dataPointType === "monthly") {
+        let resultByMonth = [];
         for (let i = 0; i < dataPointNumber; i++) {
             const currentDate = new Date(endDate)
             const monthKey = getMonth(addMonths(currentDate, i)) + 1
-            const index = summary.findIndex(record => record.label === months[monthKey])
-            if (index > -1) {
-                summary[index].monthKey = monthKey
-                continue
-            }
-
-            summary = [
-                ...summary,
+            const existMonthRecord = summary.find(record => record.monthKey === monthKey)
+            if (existMonthRecord) {
+                const { label, no_stranger, no_user, total } = existMonthRecord
+                resultByMonth = [...resultByMonth, {
+                    label,
+                    total,
+                    no_stranger,
+                    no_user
+                }]
+            } else {
+                resultByMonth = [...resultByMonth,
                 {
                     label: months[monthKey],
-                    monthKey,
                     no_stranger: 0,
                     no_user: 0,
                     total: 0
-                }
-            ]
+                }]
+            }
         }
-        return summary.sort(function (a, b) {
-            return a.monthKey - b.monthKey;
-        }).map(({ label, no_stranger, no_user, total }) => {
+        return resultByMonth.map(({ label, no_stranger, no_user, total }) => {
             return {
                 label: label.substring(0, 3),
                 no_stranger,
