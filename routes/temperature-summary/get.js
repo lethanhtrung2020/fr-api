@@ -1,11 +1,11 @@
 import knex from '@api/database'
 import {
   format,
-  subDays,
+  addDays,
   getWeek,
-  subWeeks,
+  addWeeks,
   getMonth,
-  subMonths
+  addMonths
 } from 'date-fns'
 import { BadRequestError } from '@helpers/errors'
 
@@ -116,7 +116,7 @@ function formatVisitorSummary(
   if (dataPointType === 'daily') {
     for (let i = 0; i < dataPointNumber; i++) {
       const present = new Date(endDate)
-      const dateKey = format(subDays(present, i), 'yyyy-MM-dd')
+      const dateKey = format(addDays(present, i), 'yyyy-MM-dd')
       const dateRecord = summary.find(record => record.label === dateKey)
       if (dateRecord) {
         resultSummary.registered = [
@@ -173,7 +173,7 @@ function formatVisitorSummary(
     let resultSummary = { registered: [], guest: [] }
     for (let i = 0; i < dataPointNumber; i++) {
       const currentDate = new Date(endDate)
-      const weekKey = getWeek(subWeeks(currentDate, i))
+      const weekKey = getWeek(addWeeks(currentDate, i))
       const existWeekRecord = summary.find(record => record.label === weekKey)
       if (existWeekRecord) {
         const {
@@ -230,7 +230,7 @@ function formatVisitorSummary(
   if (dataPointType === 'monthly') {
     for (let i = 0; i < dataPointNumber; i++) {
       const currentDate = new Date(endDate)
-      const monthKey = getMonth(subMonths(currentDate, i)) + 1
+      const monthKey = getMonth(addMonths(currentDate, i)) + 1
       const existMonthRecord = summary.find(
         record => record.monthKey === monthKey
       )
