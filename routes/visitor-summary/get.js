@@ -25,46 +25,55 @@ export default async (req, res) => {
     return res.success(formatSummary)
 }
 
-function validateParams({ deviceIds, dataPointType, endDate, dataPointNumber }) {
+function validateParams({ deviceIds, dataPointType, endDate, dataPointNumber, traffic }) {
     if (!dataPointType) throw new BadRequestError("dataPointType should be a string 'daily', 'monthy' or 'weekly' ")
     if (!dataPointNumber) throw new BadRequestError("dataPointNumber should be a number")
     if (!endDate) throw new BadRequestError("endDate missing")
+    if (traffic && !['exit', 'entry', 'both'].includes(traffic)) throw new BadRequestError("traffic must be exit, entry or both")
 }
 
-function getVisitorSummary({ deviceIds, dataPointType, endDate, dataPointNumber }) {
+function getVisitorSummary({ deviceIds, dataPointType, endDate, dataPointNumber, traffic }) {
     let labelColumn = ""
     let interval = ""
     let groupBy = ""
     if (dataPointType === 'daily') {
-        labelColumn = "DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(detectionTime)), '%Y-%m-%d') as label";
+        labelColumn = "DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(dl.detectionTime)), '%Y-%m-%d') as label";
         interval = 'DAY'
-        groupBy = "DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(detectionTime)), '%Y-%m-%d')"
+        groupBy = "DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(dl.detectionTime)), '%Y-%m-%d')"
     }
     if (dataPointType === 'weekly') {
-        labelColumn = "WEEK(detectionTime) as label";
+        labelColumn = "WEEK(dl.detectionTime) as label";
         interval = 'WEEK'
-        groupBy = "WEEK(detectionTime)"
+        groupBy = "WEEK(dl.detectionTime)"
     }
     if (dataPointType === 'monthly') {
-        labelColumn = "MONTHNAME(detectionTime) as label, MONTH(detectionTime) as monthKey";
+        labelColumn = "MONTHNAME(dl.detectionTime) as label, MONTH(dl.detectionTime) as monthKey";
         interval = 'MONTH'
-        groupBy = "MONTHNAME(detectionTime)"
+        groupBy = "MONTHNAME(dl.detectionTime)"
     }
 
     let condition = "true"
-    if (deviceIds && deviceIds.length) condition = condition + ` AND fromDevice IN (${deviceIds.split(',').map(id => "'" + id + "'").join(",")})`
-    if (endDate) condition = condition + ` AND detectionTime >= "${endDate} 00:00:00"`
-    if (endDate && dataPointNumber) condition = condition + ` AND detectionTime <= DATE_ADD('${endDate}', INTERVAL ${dataPointNumber} ${interval})`
+    if (deviceIds && deviceIds.length) condition = condition + ` AND dl.fromDevice IN (${deviceIds.split(',').map(id => "'" + id + "'").join(",")})`
+    if (endDate) condition = condition + ` AND dl.detectionTime >= "${endDate} 00:00:00"`
+    if (endDate && dataPointNumber) condition = condition + ` AND dl.detectionTime <= DATE_ADD('${endDate}', INTERVAL ${dataPointNumber} ${interval})`
+    if (traffic && traffic!=='both') {
+      if (traffic === 'exit') {
+        condition = condition + `AND dv.type='OUT'`
+      } else {
+        condition = condition + `AND dv.type='IN'`
+      }
+    }
 
     return knex.raw(`
         SELECT ${labelColumn}, 
             COUNT(*) as total, 
-            sum(case when type = 'STRANGER' then 1 else 0 end) as no_stranger,
-            sum(case when type = 'REGISTERED_USER' then 1 else 0 end) as no_user
-        FROM detection_logs
+            sum(case when dl.type = 'STRANGER' then 1 else 0 end) as no_stranger,
+            sum(case when dl.type = 'REGISTERED_USER' then 1 else 0 end) as no_user
+        FROM detection_logs as dl
+        LEFT JOIN devices as dv ON dl.fromDevice = dv.name
         WHERE ${condition}
         GROUP BY ${groupBy}
-        ORDER BY detectionTime ASC;
+        ORDER BY dl.detectionTime ASC;
     `)
 }
 

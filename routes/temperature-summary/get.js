@@ -36,7 +36,8 @@ function validateParams({
   deviceIds,
   dataPointType,
   endDate,
-  dataPointNumber
+  dataPointNumber,
+  traffic
 }) {
   if (!dataPointType)
     throw new BadRequestError(
@@ -45,34 +46,36 @@ function validateParams({
   if (!dataPointNumber)
     throw new BadRequestError('dataPointNumber should be a number')
   if (!endDate) throw new BadRequestError('endDate missing')
+  if (traffic && !['exit', 'entry', 'both'].includes(traffic)) throw new BadRequestError("traffic must be exit, entry or both")
 }
 
 function getVisitorSummary({
   deviceIds,
   dataPointType,
   endDate,
-  dataPointNumber
+  dataPointNumber,
+  traffic
 }) {
   let labelColumn = ''
   let interval = ''
   let groupBy = ''
   if (dataPointType === 'daily') {
     labelColumn =
-      "DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(detectionTime)), '%Y-%m-%d') as label"
+      "DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(dl.detectionTime)), '%Y-%m-%d') as label"
     interval = 'DAY'
     groupBy =
-      "DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(detectionTime)), '%Y-%m-%d')"
+      "DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(dl.detectionTime)), '%Y-%m-%d')"
   }
   if (dataPointType === 'weekly') {
-    labelColumn = 'WEEK(detectionTime, 1) as label'
+    labelColumn = 'WEEK(dl.detectionTime, 1) as label'
     interval = 'WEEK'
-    groupBy = 'WEEK(detectionTime, 1)'
+    groupBy = 'WEEK(dl.detectionTime, 1)'
   }
   if (dataPointType === 'monthly') {
     labelColumn =
-      'MONTHNAME(detectionTime) as label, MONTH(detectionTime) as monthKey'
+      'MONTHNAME(dl.detectionTime) as label, MONTH(dl.detectionTime) as monthKey'
     interval = 'MONTH'
-    groupBy = 'MONTHNAME(detectionTime)'
+    groupBy = 'MONTHNAME(dl.detectionTime)'
   }
 
   let condition = 'true'
@@ -84,24 +87,32 @@ function getVisitorSummary({
         .map(id => "'" + id + "'")
         .join(',')})`
   if (endDate)
-    condition = condition + ` AND detectionTime >= "${endDate} 23:59:59"`
+    condition = condition + ` AND dl.detectionTime >= "${endDate} 00:00:00"`
   if (endDate && dataPointNumber)
     condition =
       condition +
-      ` AND detectionTime <= DATE_ADD('${endDate} 00:00:00', INTERVAL ${dataPointNumber} ${interval})`
+      ` AND dl.detectionTime <= DATE_ADD('${endDate} 00:00:00', INTERVAL ${dataPointNumber} ${interval})`
+  if (traffic && traffic!=='both') {
+  if (traffic === 'exit') {
+      condition = condition + `AND dv.type='OUT'`
+  } else {
+      condition = condition + `AND dv.type='IN'`
+  }
+  }
 
   return knex.raw(`
         SELECT ${labelColumn},
-            sum(case when type = 'STRANGER' AND bodyTemperature>=35.5 AND bodyTemperature <=37.5 then 1 else 0 end) as no_stranger_pass,
-            sum(case when type = 'STRANGER' AND (bodyTemperature<35.5 OR bodyTemperature >37.5) then 1 else 0 end) as no_stranger_fail,
-            sum(case when type = 'STRANGER' then 1 else 0 end) as total_stranger,
-            sum(case when type = 'REGISTERED_USER' AND bodyTemperature>=35.5 AND bodyTemperature <=37.5 then 1 else 0 end) as no_user_pass,
-            sum(case when type = 'REGISTERED_USER' AND (bodyTemperature<35.5 OR bodyTemperature >37.5) then 1 else 0 end) as no_user_fail,
-            sum(case when type = 'REGISTERED_USER' then 1 else 0 end) as total_user
-        FROM detection_logs
+            sum(case when dl.type = 'STRANGER' AND dl.bodyTemperature>=35.5 AND dl.bodyTemperature <=37.5 then 1 else 0 end) as no_stranger_pass,
+            sum(case when dl.type = 'STRANGER' AND (dl.bodyTemperature<35.5 OR dl.bodyTemperature >37.5) then 1 else 0 end) as no_stranger_fail,
+            sum(case when dl.type = 'STRANGER' then 1 else 0 end) as total_stranger,
+            sum(case when dl.type = 'REGISTERED_USER' AND dl.bodyTemperature>=35.5 AND dl.bodyTemperature <=37.5 then 1 else 0 end) as no_user_pass,
+            sum(case when dl.type = 'REGISTERED_USER' AND (dl.bodyTemperature<35.5 OR dl.bodyTemperature >37.5) then 1 else 0 end) as no_user_fail,
+            sum(case when dl.type = 'REGISTERED_USER' then 1 else 0 end) as total_user
+        FROM detection_logs as dl
+        LEFT JOIN devices as dv ON dl.fromDevice = dv.name
         WHERE ${condition}
         GROUP BY ${groupBy}
-        ORDER BY detectionTime ASC;
+        ORDER BY dl.detectionTime ASC;
     `)
 }
 
