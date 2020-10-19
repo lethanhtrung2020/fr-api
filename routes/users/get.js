@@ -23,9 +23,9 @@ export default async (req, res) => {
   //             this.on('u.block_id', '=', 'b.id');
   //       }
   //   );
-  knex.select('u.*, b.`name` as block_name').from('users').as('u').leftJoin('blocks as b', function() {
+  const lstUsers = await knex.select('u.*, b.name as block_name').from('users as u').leftJoin('blocks as b', function() {
     this.on('b.id', '=', 'u.block_id')
-  })
+  }).where('u.sn', device).offset(offset).limit(pageSize);
 
   // const superJoinData = await knex(
   //       knex<Process>('users')
