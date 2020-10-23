@@ -2,15 +2,15 @@ import knex from '@api/database.js'
 import { BadRequestError } from '@helpers/errors'
 
 export default async (req, res) => {
-  const { deviceId } = req.params
+  const { name } = req.params
 
-  validateParams({ userId, device })
+  validateParams({ name })
 
-  const [device] = await knex('devices').where('name', deviceId).select()
+  const [device] = await knex('devices').where('name', name).select()
 
   return res.success(device)
 }
 
-function validateParams({ deviceId }) {
-  if (!deviceId) throw new BadRequestError("deviceId not valid")
+function validateParams({ name }) {
+  if (!name) throw new BadRequestError("Device's name is require!")
 }
