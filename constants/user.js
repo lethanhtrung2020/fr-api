@@ -3,5 +3,5 @@ export const status  = {
     outside: 'outside'
 }
 
-export const residentPrefix = "R_"
-export const guestPrefix = "G_"
+export const residentPrefix = "R"
+export const guestPrefix = "G"
