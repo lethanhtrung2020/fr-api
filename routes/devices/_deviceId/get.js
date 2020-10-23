@@ -12,5 +12,5 @@ export default async (req, res) => {
 }
 
 function validateParams({ deviceId }) {
-  if (!userId) throw new BadRequestError("deviceId not valid")
+  if (!deviceId) throw new BadRequestError("deviceId not valid")
 }
