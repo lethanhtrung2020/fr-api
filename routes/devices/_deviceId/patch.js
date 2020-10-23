@@ -7,7 +7,7 @@ export default async (req, res) => {
 
   validateParams({ name })
 
-  const devices = await knex('devices').where('name', name).select('id')
+  const devices = await knex('devices').where('name', '=', name).select('id')
   const id = devices.map(device => device.id)
   await knex('devices').whereIn('id', id).update({ display_name: displayName })
 

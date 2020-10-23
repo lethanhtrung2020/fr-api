@@ -6,7 +6,7 @@ export default async (req, res) => {
 
   validateParams({ name })
 
-  const [device] = await knex('devices').where('name', name).select()
+  const [device] = await knex('devices').where('name', '=', name).select()
 
   return res.success(device)
 }
