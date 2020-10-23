@@ -1,19 +1,22 @@
-import knex from '@api/database.js'
-import { BadRequestError } from '@helpers/errors'
+import knex from "./_deviceId/node_modules/@api/database.js.js";
+import { BadRequestError } from "./_deviceId/node_modules/@helpers/errors";
 
 export default async (req, res) => {
-  const { deviceIds } = req.query
+  const { deviceIds } = req.query;
 
-  validateParams({ deviceIds })
+  validateParams({ deviceIds });
 
-  const ids = deviceIds.split(',')
-  const devices = await knex('devices').whereIn('name', ids).select('id', 'name', 'display_name')
+  const ids = deviceIds.split(",");
+  const devices = await knex("devices")
+    .whereIn("name", ids)
+    .select("id", "name", "display_name");
 
-  return res.success(devices)
-}
+  return res.success(devices);
+};
 
 function validateParams({ deviceIds }) {
-    if (!deviceIds) throw new BadRequestError("deviceIds not valid")
-    const deviceIdInArray = deviceIds.split(',')
-    if (!deviceIdInArray.length) throw new BadRequestError("Cannot convert deviceIds to array")
+  if (!deviceIds) throw new BadRequestError("deviceIds not valid");
+  const deviceIdInArray = deviceIds.split(",");
+  if (!deviceIdInArray.length)
+    throw new BadRequestError("Cannot convert deviceIds to array");
 }
