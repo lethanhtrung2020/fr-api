@@ -1,5 +1,5 @@
 import knex from '@api/database.js'
-import { BadRequestError } from "./_deviceId/node_modules/@helpers/errors";
+import { BadRequestError } from '@helpers/errors'
 
 export default async (req, res) => {
   const { deviceIds } = req.query;
