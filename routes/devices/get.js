@@ -1,4 +1,4 @@
-import knex from "./_deviceId/node_modules/@api/database.js";
+import knex from '@api/database.js'
 import { BadRequestError } from "./_deviceId/node_modules/@helpers/errors";
 
 export default async (req, res) => {
