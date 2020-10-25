@@ -4,7 +4,7 @@ import { BadRequestError } from '@helpers/errors'
 export default async (req, res) => {
   const { deviceId } = req.params
   const { names } = req.query
-  const { displayName, blockId, siteId, floorId, companyId } = req.body
+  const { displayName, blockId, siteId, floorId, companyId, customName } = req.body
 
   validateParams({ deviceId, names })
   const arrNames = names.split(",")
@@ -13,6 +13,7 @@ export default async (req, res) => {
   const lstDeviceId = devices.map(device => device.id)
   await knex('devices').whereIn('id', lstDeviceId).update({ 
     display_name: displayName,
+    custom_name: customName,
     block_id: blockId,
     site_id: siteId,
     floor_id: floorId,
