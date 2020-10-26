@@ -5,6 +5,7 @@ export default async (req, res) => {
   const { userId } = req.params
   const { devices } = req.query
   const { blockId, companyId, siteId, floorId, cardId } = req.body
+  console.log('userId: ' + userId);
   console.log('body: ' + JSON.stringify(req.body));
   validateParams({ userId, devices })
   const deviceIds = devices.split(",")
