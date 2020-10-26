@@ -20,7 +20,7 @@ export default async (req, res) => {
   return res.success("OK")
 }
 
-function validateParams({ ic, devices }) {
+function validateParams({userId, devices, ic }) {
   if (!userId) throw new BadRequestError("User ID not valid")
   if (!devices) throw new BadRequestError("Devices in query not valid")
   if (!ic) throw new BadRequestError("IC Card not valid")
