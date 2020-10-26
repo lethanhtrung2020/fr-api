@@ -11,6 +11,9 @@ export default async (req, res) => {
   const deviceIds = devices.split(",")
 
   const users = await knex('users').where('userId', userId).where('icCard', ic).whereIn('sn', deviceIds).select('id')
+  Object.values(users).forEach(user => {
+    console.log(user);
+  })
   const userIds = users.map(user => user.id)
   await knex('users').whereIn('userId', userIds).update({ block_id: blockId, company_id: companyId, site_id: siteId, floor_id: floorId, card_id: cardId })
 
