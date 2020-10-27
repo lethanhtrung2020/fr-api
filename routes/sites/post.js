@@ -9,14 +9,12 @@ export default async (req, res) => {
         await knex.transaction(async trx => {
 
             const { site } = req.body
-
-
-            const ids = await knex('sites').insert(site, 'id').transacting(trx)
+            const id = await knex('sites').insert(site, 'id').transacting(trx)
 
             // books.forEach(book => book.catalogue_id = ids[0])
             // await knex('books').insert(books).transacting(trx)
-
-            console.log(inserts.length + ' new site saved.')
+            console.log('New site saved: ' + id)
+            return res.success("OK")
         })
     } catch (error) {
         console.error(error);
