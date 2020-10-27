@@ -7,7 +7,7 @@ export default async (req, res) => {
        
         trx('sites').insert({short_name: sn, name: name, description: desc , active: 1, created_date: knex.fn.now(),  updated_date: knex.fn.now()}, 'id')
         .then(function(id) {
-            console.log('New site saved: ' + id)
+            // console.log('New site saved: ' + id)
             return res.success("OK")
         })
         .then(trx.commit)
