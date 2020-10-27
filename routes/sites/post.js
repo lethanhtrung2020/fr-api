@@ -6,14 +6,26 @@ export default async (req, res) => {
     // return res.success("OK")
 
     try {
-        await knex.transaction(async trx => {
-
-            const { site } = req.body
-            console.log('site: ' + JSON.stringify(site));
-            const id = await knex('sites').insert({ site }, 'id').transacting(trx)
+        // Using trx as a transaction object:
+        const trx = await knex.transaction();
+        const { site } = req.body
+        console.log('site: ' + JSON.stringify(site));
+        trx('sites').insert(site, 'id')
+        .then(function(id) {
+            // books.forEach((book) => book.catalogue_id = ids[0]);
             console.log('New site saved: ' + id)
             return res.success("OK")
+            // trx('books').insert(books);
         })
+        .then(trx.commit)
+        .catch(trx.rollback);
+        // await knex.transaction(async trx => {
+
+        
+        //     const id = await knex('sites').insert(site, 'id').transacting(trx)
+        //     console.log('New site saved: ' + id)
+        //     return res.success("OK")
+        // })
     } catch (error) {
         console.error(error);
     }
