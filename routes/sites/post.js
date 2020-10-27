@@ -2,7 +2,7 @@ import knex from '@api/database.js'
 import { BadRequestError } from '@helpers/errors'
 export default async (req, res) => {
     try {
-        const { site } = req.body
+        const site = req.body
          console.log('site: ' + JSON.stringify(site));
         await knex('site').insert(site);
         return res.success("OK")
