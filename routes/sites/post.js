@@ -2,21 +2,22 @@ import knex from '@api/database.js'
 import { BadRequestError } from '@helpers/errors'
 export default async (req, res) => {
     try {
-        const site = req.body
-         console.log('site: ' + JSON.stringify(site));
-        await knex('site').insert(site);
-        return res.success("OK")
+        // const site = req.body
+        // console.log('site: ' + JSON.stringify(site));
+        // await knex('sites').insert(site);
+        // return res.success("OK")
         // Using trx as a transaction object:
-        // const trx = await knex.transaction();
-        // const { site } = req.body
+        const trx = await knex.transaction();
+        const site = req.body
+        console.log('site: ' + JSON.stringify(site));
        
-        // trx('sites').insert(site, 'id')
-        // .then(function(id) {
-        //     console.log('New site saved: ' + id)
-        //     return res.success("OK")
-        // })
-        // .then(trx.commit)
-        // .catch(trx.rollback);
+        trx('sites').insert(site, 'id')
+        .then(function(id) {
+            console.log('New site saved: ' + id)
+            return res.success("OK")
+        })
+        .then(trx.commit)
+        .catch(trx.rollback);
         // await knex.transaction(async trx => {
 
         
