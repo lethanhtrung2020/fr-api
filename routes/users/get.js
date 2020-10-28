@@ -22,7 +22,7 @@ export default async (req, res) => {
   .leftJoin("sites as s", function() {
     this.on("s.short_name", "=", "u.site_id")
   })
-  .where("u.sn", device).orWhere('site_id', site).orWhere('block_id', block).orWhere('floor_id', floor).orWhere('company_id', comp).offset(offset).limit(pageSize);
+  .where("u.sn", device).orWhere('u.site_id', site).orWhere('u.block_id', block).orWhere('u.floor_id', floor).orWhere('u.company_id', comp).offset(offset).limit(pageSize);
 
   return res.success(lstUsers)
 }
