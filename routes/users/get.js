@@ -2,7 +2,7 @@ import knex from '@api/database.js'
 import { BadRequestError } from '@helpers/errors'
 
 export default async (req, res) => {
-  const { device, page=1, pageSize=15 } = req.query
+  const { device, site, block, floor, comp, page=1, pageSize=15 } = req.query
 
   validateParams({  device })
   const offset = (page-1)*pageSize
@@ -22,11 +22,11 @@ export default async (req, res) => {
   .leftJoin("sites as s", function() {
     this.on("s.short_name", "=", "u.site_id")
   })
-  .where("u.sn", device).offset(offset).limit(pageSize);
+  .where("u.sn", device).orWhere('site_id', site).orWhere('block_id', block).orWhere('floor_id', floor).orWhere('company_id', comp).offset(offset).limit(pageSize);
 
   return res.success(lstUsers)
 }
 
 function validateParams({  device }) {
-  if (!device) throw new BadRequestError("device not valid")
+  if (!device) throw new BadRequestError("Device not valid")
 }
