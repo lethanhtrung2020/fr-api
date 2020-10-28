@@ -4,6 +4,7 @@ import { BadRequestError } from '@helpers/errors'
 export default async (req, res) => {
   const { device, site='', block='', floor='', comp='', page=1, pageSize=15 } = req.query
 
+  console.log('site: ' + site + ' - block: ' + block + ' - floor: ' + floor + ' - comp: ' + comp);
   validateParams({  device })
   const offset = (page-1)*pageSize
 
@@ -22,7 +23,7 @@ export default async (req, res) => {
   .leftJoin("sites as s", function() {
     this.on("s.short_name", "=", "u.site_id")
   })
-  .where("u.sn", device).orWhere('u.site_id', site).orWhere('u.block_id', block).orWhere('u.floor_id', floor).orWhere('u.company_id', comp).offset(offset).limit(pageSize);
+  .where("u.sn", device).where('u.site_id', site).where('u.block_id', block).where('u.floor_id', floor).where('u.company_id', comp).offset(offset).limit(pageSize);
 
   return res.success(lstUsers)
 }
