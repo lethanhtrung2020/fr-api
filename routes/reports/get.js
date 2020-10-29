@@ -2,7 +2,7 @@ import knex from '@api/database.js'
 import { BadRequestError } from '@helpers/errors'
 
 export default async (req, res) => {
-  const { device, site='', block='', floor='', comp='', page=1, pageSize=15 } = req.query
+  const { type='', device, site='', block='', floor='', comp='', page=1, pageSize=15 } = req.query
   validateParams({  device })
   const offset = (page-1)*pageSize
 
@@ -26,7 +26,7 @@ export default async (req, res) => {
   .leftJoin("sites as s", function() {
     this.on("s.short_name", "=", "u.site_id")
   })
-  .where('l.fromDevice', device).where('u.site_id', 'like', `%${site}%`).where('u.block_id', 'like', `%${block}%`).where('u.floor_id', 'like', `%${floor}%`).where('u.company_id', 'like', `%${comp}%`).offset(offset);
+  .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('u.site_id', 'like', `%${site}%`).where('u.block_id', 'like', `%${block}%`).where('u.floor_id', 'like', `%${floor}%`).where('u.company_id', 'like', `%${comp}%`).offset(offset);
   // .limit(pageSize)
 
   return res.success(lstReports)
