@@ -14,22 +14,26 @@ export default async (req, res) => {
     this.on("u.active", 1)
   })
   .leftJoin("devices as d", function() {
-    this.on("l.fromDevice", "d.name")
+    this.on("l.fromDevice", "d.name"),
+    this.on("d.active", 1)
   })
   .leftJoin("blocks as b", function() {
-    this.on("b.short_name", "d.block_id")
+    this.on("b.short_name", "d.block_id"),
+    this.on("b.active", 1)
   })
   .leftJoin("companies as c", function() {
-    this.on("c.short_name", "d.company_id")
+    this.on("c.short_name", "d.company_id"),
+    this.on("c.active", 1)
   })
   .leftJoin("floors as f", function() {
-    this.on("f.short_name", "d.floor_id")
+    this.on("f.short_name", "d.floor_id"),
+    this.on("f.active", 1)
   })
   .leftJoin("sites as s", function() {
-    this.on("s.short_name", "d.site_id")
+    this.on("s.short_name", "d.site_id"),
+    this.on("s.active", 1)
   })
   .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).orderBy('l.detectionTime', 'desc').offset(offset);
-  // .limit(pageSize) .where('u.active', 1)
 
   return res.success(lstReports)
 }
