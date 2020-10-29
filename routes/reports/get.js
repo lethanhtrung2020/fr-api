@@ -6,7 +6,7 @@ export default async (req, res) => {
   validateParams({  device })
   const offset = (page-1)*pageSize
 
-  const lstReports = await knex.select("l.*", "u.name", "u.icCard", "u.phone", "u.block_id", "u.company_id", "u.floor_id", "u.site_id", "d.type as dev_type", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
+  const lstReports = await knex.select("l.*", "u.name", "u.icCard", "u.phone", "u.block_id", "u.company_id", "u.floor_id", "u.site_id", "d.type as dev_type", "d.custom_name as dev_name", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
   .from("detection_logs as l")
   .leftJoin("users as u", function() {
     this.on("l.userId", "u.userId")
