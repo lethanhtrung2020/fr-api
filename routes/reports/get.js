@@ -2,16 +2,16 @@ import knex from '@api/database.js'
 import { BadRequestError } from '@helpers/errors'
 
 export default async (req, res) => {
-  const { type='', device, site='', block='', floor='', comp='', page=1, pageSize=15 } = req.query
+  const { type='', device, temp = '', site='', block='', floor='', comp='', page=1, pageSize=15 } = req.query
   validateParams({  device })
   const offset = (page-1)*pageSize
-  console.log('type: ' + String(type).toUpperCase())
+
   const lstReports = await knex.select("l.*", "u.name", "u.icCard", "u.phone", "d.block_id", "d.company_id", "d.floor_id", "d.site_id", "d.type as dev_type", "d.custom_name as dev_name", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
   .from("detection_logs as l")
-  .innerJoin("users as u")
-  // .leftJoin("users as u", function() {
-  //   this.on("l.userId", "u.userId")
-  // })
+  // .innerJoin("users as u")
+  .leftJoin("users as u", function() {
+    this.on("l.userId", "u.userId")
+  })
   .leftJoin("devices as d", function() {
     this.on("l.fromDevice", "d.name")
   })
