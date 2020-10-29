@@ -16,16 +16,16 @@ export default async (req, res) => {
     this.on("l.fromDevice", "d.name")
   })
   .leftJoin("blocks as b", function() {
-    this.on("b.short_name", "l.block_id")
+    this.on("b.short_name", "d.block_id")
   })
   .leftJoin("companies as c", function() {
-    this.on("c.short_name", "l.company_id")
+    this.on("c.short_name", "d.company_id")
   })
   .leftJoin("floors as f", function() {
-    this.on("f.short_name", "l.floor_id")
+    this.on("f.short_name", "d.floor_id")
   })
   .leftJoin("sites as s", function() {
-    this.on("s.short_name", "l.site_id")
+    this.on("s.short_name", "d.site_id")
   })
   .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).offset(offset);
   // .limit(pageSize)
