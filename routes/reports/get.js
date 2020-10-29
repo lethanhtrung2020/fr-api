@@ -10,7 +10,8 @@ export default async (req, res) => {
   .from("detection_logs as l")
   // .innerJoin("users as u")
   .leftJoin("users as u", function() {
-    this.on("l.userId", "u.userId")
+    this.on("l.userId", "u.userId"),
+    this.on("u.active", 1)
   })
   .leftJoin("devices as d", function() {
     this.on("l.fromDevice", "d.name")
@@ -28,7 +29,7 @@ export default async (req, res) => {
     this.on("s.short_name", "d.site_id")
   })
   .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).orderBy('l.detectionTime', 'desc').offset(offset);
-  // .limit(pageSize)
+  // .limit(pageSize) .where('u.active', 1)
 
   return res.success(lstReports)
 }
