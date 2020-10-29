@@ -26,7 +26,7 @@ export default async (req, res) => {
   .leftJoin("sites as s", function() {
     this.on("s.short_name", "=", "u.site_id")
   })
-  .where('l.fromDevice', device).where('l.site_id', 'like', `%${site}%`).where('l.block_id', 'like', `%${block}%`).where('l.floor_id', 'like', `%${floor}%`).where('l.company_id', 'like', `%${comp}%`).offset(offset).limit(pageSize);
+  .where('l.fromDevice', device).where('u.site_id', 'like', `%${site}%`).where('u.block_id', 'like', `%${block}%`).where('u.floor_id', 'like', `%${floor}%`).where('u.company_id', 'like', `%${comp}%`).offset(offset).limit(pageSize);
 
   return res.success(lstReports)
 }
