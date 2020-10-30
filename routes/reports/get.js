@@ -4,7 +4,8 @@ import { BadRequestError } from '@helpers/errors'
 export default async (req, res) => {
   const {device, type='', sd='', ed='', temp = '', site='', block='', floor='', comp='', page=1, pageSize=15 } = req.query
   validateParams({  device })
-  console.log('startDate: ' + new Date(sd.toString()) + ' - endDate: ' +  new Date(ed.toString()));
+  console.log('dt: ' + new Date('2020-09-20 11:31:21') + ' - startDate: ' + new Date(sd === '' ? new Date() : sd.toString()) + ' - endDate: ' +  new Date(ed === '' ? new Date() : ed.toString()));
+  console.log('compare: ' +  new Date('2020-09-20 11:31:21') >= new Date(sd === '' ? new Date() : sd.toString()));
   const offset = (page-1)*pageSize
 
   const lstReports = await knex.select("l.*", "u.name", "u.icCard", "u.phone", "d.block_id", "d.company_id", "d.floor_id", "d.site_id", "d.type as dev_type", "d.custom_name as dev_name", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
