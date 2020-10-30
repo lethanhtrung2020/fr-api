@@ -35,7 +35,7 @@ export default async (req, res) => {
     this.on("s.short_name", "d.site_id"),
     this.on("s.active", 1)
   })
-  .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).where(knex.raw('?', [new Date('l.detectionTime').toDateString()]), '>=', knex.raw('?', [sd.toString()])).orderBy('l.detectionTime', 'desc').offset(offset);
+  .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).whereBetween(knex.raw('?', [new Date('l.detectionTime').toDateString()]), [knex.raw('?', [sd.toString()]), knex.raw('?', [ed.toString()])]).orderBy('l.detectionTime', 'desc').offset(offset);
   // .whereBetween('l.detectionTime', [sd === '' ? new Date('1/1/1900').toString() : sd.toString(), ed === '' ? new Date().toString() : ed.toString()])
   // .where(new Date('l.detectionTime').toDateString(), '>=', knex.raw('?', new Date(sd.toString()).toDateString())).where(new Date('l.detectionTime').toDateString(), '<=', knex.raw('?', new Date(ed.toString()).toDateString()))
   return res.success(lstReports)
