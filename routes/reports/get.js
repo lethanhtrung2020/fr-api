@@ -2,7 +2,7 @@ import knex from '@api/database.js'
 import { BadRequestError } from '@helpers/errors'
 
 export default async (req, res) => {
-  const {device, type='', sd, ed, temp = '', site='', block='', floor='', comp='', page=1, pageSize=15 } = req.query
+  const {device, type='', sd='', ed='', temp = '', site='', block='', floor='', comp='', page=1, pageSize=15 } = req.query
   validateParams({  device })
   console.log('startDate: ' + sd + ' - endDate: ' +  ed);
   const offset = (page-1)*pageSize
