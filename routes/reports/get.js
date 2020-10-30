@@ -2,8 +2,9 @@ import knex from '@api/database.js'
 import { BadRequestError } from '@helpers/errors'
 
 export default async (req, res) => {
-  const { type='', device, temp = '', site='', block='', floor='', comp='', page=1, pageSize=15 } = req.query
+  const {device, type='', sd, ed, temp = '', site='', block='', floor='', comp='', page=1, pageSize=15 } = req.query
   validateParams({  device })
+  console.log('startDate: ' + sd + ' - endDate: ' +  ed);
   const offset = (page-1)*pageSize
 
   const lstReports = await knex.select("l.*", "u.name", "u.icCard", "u.phone", "d.block_id", "d.company_id", "d.floor_id", "d.site_id", "d.type as dev_type", "d.custom_name as dev_name", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
@@ -33,7 +34,7 @@ export default async (req, res) => {
     this.on("s.short_name", "d.site_id"),
     this.on("s.active", 1)
   })
-  .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).orderBy('l.detectionTime', 'desc').offset(offset);
+  .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).whereBetween('l.detectionTime', [sd.toString(), ed.toString()]).orderBy('l.detectionTime', 'desc').offset(offset);
 
   return res.success(lstReports)
 }
