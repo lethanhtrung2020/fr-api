@@ -7,12 +7,13 @@ export default async (req, res) => {
   validateParams({  device })
   // console.log('dt: ' + new Date('2020-09-20 11:31:21').toDateString() + ' - startDate: ' + new Date(sd === '' ? new Date() : sd.toString()).toDateString() + ' - endDate: ' +  new Date(ed === '' ? new Date() : ed.toString()).toDateString());
   // console.log('compare: ' +  new Date('2020-10-20 11:31:21').toDateString() === new Date(sd === '' ? new Date() : sd.toString()).toDateString());
-  console.log('sd: ' +  (sd === '' ? moment().format('mm/dd/yyyy hh:mm') : moment(sd).format('mm/dd/yyyy hh:mm')) + ' -  ed: ' +  (ed === '' ? moment().format('mm/dd/yyyy hh:mm') : moment(ed).format('mm/dd/yyyy hh:mm')));
+  //[sd === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(sd).format('DD-MM-YYYY hh:mm'), ed === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(ed).format('DD-MM-YYYY hh:mm')]
+  console.log('sd: ' +  (sd === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(sd).format('DD-MM-YYYY hh:mm')) + ' -  ed: ' +  (ed === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(ed).format('DD-MM-YYYY hh:mm')));
   // , \'%Y-%m-%d\'
   const offset = (page-1)*pageSize
 
   const lstReports = await knex.select("l.*", "u.name", "u.icCard", "u.phone", "d.block_id", "d.company_id", "d.floor_id", "d.site_id", "d.type as dev_type", "d.custom_name as dev_name", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
-  .from("detection_logs as l").whereRaw('moment(l.detectionTime).format(\'mm/dd/yyyy hh:mm\') BETWEEN ? AND ?', [sd === '' ? moment().format('mm/dd/yyyy hh:mm') : moment(sd).format('mm/dd/yyyy hh:mm'), ed === '' ? moment().format('mm/dd/yyyy hh:mm') : moment(ed).format('mm/dd/yyyy hh:mm')])
+  .from("detection_logs as l").whereRaw(moment('l.detectionTime').format('DD-MM-YYYY hh:mm') + ' BETWEEN ? AND ?', [sd , ed])
   
   .leftJoin("users as u", function() {
     this.on("l.userId", "u.userId"),
