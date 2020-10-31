@@ -9,7 +9,7 @@ export default async (req, res) => {
   // console.log('compare: ' +  new Date('2020-10-20 11:31:21').toDateString() === new Date(sd === '' ? new Date() : sd.toString()).toDateString());
   //[sd === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(sd).format('DD-MM-YYYY hh:mm'), ed === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(ed).format('DD-MM-YYYY hh:mm')]
   //.whereRaw(moment('l.detectionTime').format('DD-MM-YYYY hh:mm') + ' BETWEEN ? AND ?', [sd === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(sd).format('DD-MM-YYYY hh:mm'), ed === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(ed).format('DD-MM-YYYY hh:mm')])
-  console.log('sd: ' +  (sd === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(sd).format('DD-MM-YYYY hh:mm')) + ' -  ed: ' +  (ed === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(ed).format('DD-MM-YYYY hh:mm')));
+  // console.log('sd: ' +  (sd === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(sd).format('DD-MM-YYYY hh:mm')) + ' -  ed: ' +  (ed === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(ed).format('DD-MM-YYYY hh:mm')));
   // , \'%Y-%m-%d\'
   const offset = (page-1)*pageSize
 
