@@ -12,6 +12,8 @@ export default async (req, res) => {
   // console.log('sd: ' +  (sd === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(sd).format('DD-MM-YYYY hh:mm')) + ' -  ed: ' +  (ed === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(ed).format('DD-MM-YYYY hh:mm')));
   // , \'%Y-%m-%d\'
   const offset = (page-1)*pageSize
+  console.log('sd: ' +  ed.toString()  === '' ? moment().subtract(7, 'days').format('YYYY-MM-DD 00:00') : ed.toString());
+  console.log('ed: ' +  ed.toString()  === '' ? moment().format('YYYY-MM-DD 00:00') : ed.toString());
   const lstReports = await knex.select("l.*", "u.name", "u.icCard", "u.phone", "d.block_id", "d.company_id", "d.floor_id", "d.site_id", "d.type as dev_type", "d.custom_name as dev_name", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
   .from("detection_logs as l")
   
@@ -39,8 +41,8 @@ export default async (req, res) => {
     this.on("s.short_name", "d.site_id"),
     this.on("s.active", 1)
   })
-  .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).whereRaw('date_format(detectionTime, \'%Y-%m-%d  %H:%i\') between cast(\''+sd.toString()===''?moment().subtract(7, 'days').format('YYYY-MM-DD 00:00'):sd.toString()+'\' as date) and cast(\''+ed.toString()===''?moment().format('YYYY-MM-DD 00:00'):ed.toString()+'\' as date)').orderBy('l.detectionTime', 'desc').offset(offset);
-  //whereRaw('date_format(detectionTime, \'%Y-%m-%d  %H:%i\') between cast(\''+sd.toString()===''?moment().subtract(7, 'days').format('YYYY-MM-DD 00:00'):sd.toString()+'\' as date) and cast(\''+ed.toString()===''?moment().format('YYYY-MM-DD 00:00'):ed.toString()+'\' as date)')
+  .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).whereRaw('date_format(detectionTime, \'%Y-%m-%d  %H:%i\') between cast(\''+sd.toString()+'\' as date) and cast(\''+ed.toString()+'\' as date)').orderBy('l.detectionTime', 'desc;').offset(offset);
+  // (date_format(detectionTime, '%Y-%m-%d  %H:%i') between cast('2020-9-10 12:20' as date) and cast('2020-09-14 9:41' as date))
   // .whereRaw('date_format(l.detectionTime, \'%Y-%m-%d %H:%i\') >= cast(\''+sd+'\' as date)').whereRaw('date_format(l.detectionTime, \'%Y-%m-%d %H:%i\') <= cast(\''+ed+'\' as date)')
   //.whereRaw('date_format(l.detectionTime, \'%Y-%m-%d %H:%i\') between ? and ?', ['cast(\`' + sd + '\` as date)', 'cast(\`' + ed + '\` as date)'])
   // whereRaw('date_format(l.detectionTime, \'%Y-%m-%d %H:%i\') between ? and ?', ['cast(\`' + sd + '\` as date)', 'cast(\`' + ed + '\` as date)'])
