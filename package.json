@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon index.js",
+    "dev": "nodemon --inspect index.js",
     "start": "node index.js"
   },
   "dependencies": {
@@ -25,5 +25,8 @@
     "@constants": "./constants/",
     "@helpers": "./helpers/",
     "@middleware": "./middleware/"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
   }
 }
