@@ -7,12 +7,13 @@ export default async (req, res) => {
   // console.log('dt: ' + new Date('2020-09-20 11:31:21').toDateString() + ' - startDate: ' + new Date(sd === '' ? new Date() : sd.toString()).toDateString() + ' - endDate: ' +  new Date(ed === '' ? new Date() : ed.toString()).toDateString());
   // console.log('compare: ' +  new Date('2020-10-20 11:31:21').toDateString() === new Date(sd === '' ? new Date() : sd.toString()).toDateString());
   // console.log('dt: ' +  moment());
+  // , \'%Y-%m-%d\'
   const offset = (page-1)*pageSize
 
   const lstReports = await knex.select("l.*", "u.name", "u.icCard", "u.phone", "d.block_id", "d.company_id", "d.floor_id", "d.site_id", "d.type as dev_type", "d.custom_name as dev_name", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
-  .from("detection_logs as l").whereRaw('date_format(l.detectionTime, \'%Y-%m-%d\') BETWEEN ? AND ?', [sd, ed])
+  .from("detection_logs as l").whereRaw('date_format(l.detectionTime) BETWEEN ? AND ?', [sd, ed])
   // .innerJoin("users as u")
-  .leftJoin("users as u", function() {
+  .leftJoin("`users` as u", function() {
     this.on("l.userId", "u.userId"),
     this.on("u.active", 1)
   })
