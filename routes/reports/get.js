@@ -40,7 +40,7 @@ export default async (req, res) => {
     this.on("s.short_name", "d.site_id"),
     this.on("s.active", 1)
   })
-  .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).whereRaw('date_format(l.detectionTime, \'%Y-%m-%d %H:%i\') >= cast(\''+sd+'\' as date)').orderBy('l.detectionTime', 'desc').offset(offset);
+  .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).whereRaw('date_format(l.detectionTime, \'%Y-%m-%d %H:%i\') >= cast(\''+sd+'\' as date)').whereRaw('date_format(l.detectionTime, \'%Y-%m-%d %H:%i\') <= cast(\''+ed+'\' as date)').orderBy('l.detectionTime', 'desc').offset(offset);
   // 2020-10-09 12:22
   //.whereRaw('date_format(l.detectionTime, \'%Y-%m-%d %H:%i\') between ? and ?', ['cast(\`' + sd + '\` as date)', 'cast(\`' + ed + '\` as date)'])
   // whereRaw('date_format(l.detectionTime, \'%Y-%m-%d %H:%i\') between ? and ?', ['cast(\`' + sd + '\` as date)', 'cast(\`' + ed + '\` as date)'])
