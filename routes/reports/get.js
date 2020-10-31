@@ -9,7 +9,7 @@ export default async (req, res) => {
   const offset = (page-1)*pageSize
 
   const lstReports = await knex.select("l.*", "u.name", "u.icCard", "u.phone", "d.block_id", "d.company_id", "d.floor_id", "d.site_id", "d.type as dev_type", "d.custom_name as dev_name", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
-  .from("`detection_logs` as l").where(new Date('l.detectionTime').toDateString(), '>=', sd)
+  .from("detection_logs as l").where(new Date('l.detectionTime').toDateString(), '>=', sd)
   // .innerJoin("users as u")
   .leftJoin("users as u", function() {
     this.on("l.userId", "u.userId"),
@@ -36,6 +36,7 @@ export default async (req, res) => {
     this.on("s.active", 1)
   })
   .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).orderBy('l.detectionTime', 'desc').offset(offset);
+  // .where(new Date('l.detectionTime').toDateString(), '>=', sd)
   // .whereBetween('l.detectionTime', [sd === '' ? new Date('1/1/1900').toString() : sd.toString(), ed === '' ? new Date().toString() : ed.toString()])
   // .where(new Date('l.detectionTime').toDateString(), '>=', knex.raw('?', new Date(sd.toString()).toDateString())).where(new Date('l.detectionTime').toDateString(), '<=', knex.raw('?', new Date(ed.toString()).toDateString()))
   //where(knex.raw('?', [new Date('l.detectionTime').toDateString()]), [knex.raw('?', [sd.toString()]), knex.raw('?', [ed.toString()])])
