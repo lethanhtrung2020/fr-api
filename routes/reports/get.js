@@ -16,7 +16,7 @@ export default async (req, res) => {
   const lstReports = await knex.select("l.*", "u.name", "u.icCard", "u.phone", "d.block_id", "d.company_id", "d.floor_id", "d.site_id", "d.type as dev_type", "d.custom_name as dev_name", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
   .from("detection_logs as l")
   
-  .leftJoin("users as u", function() {
+  .leftJoin("`users` as u", function() {
     this.on("l.userId", "u.userId"),
     this.on("u.active", 1)
   })
@@ -40,7 +40,7 @@ export default async (req, res) => {
     this.on("s.short_name", "d.site_id"),
     this.on("s.active", 1)
   })
-  .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).whereRaw('date_format(l.detectionTime, \'%Y-%m-%d %H:%i\') >= ?', ['cast(\'2020-10-09 12:22\' as date)']).orderBy('l.detectionTime', 'desc').offset(offset);
+  .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).whereRaw('date_format(l.detectionTime, \'%Y-%m-%d %H:%i\') >= cast(\'2020-10-09 12:22\' as date)').orderBy('l.detectionTime', 'desc').offset(offset);
   //.whereRaw('date_format(l.detectionTime, \'%Y-%m-%d %H:%i\') between ? and ?', ['cast(\`' + sd + '\` as date)', 'cast(\`' + ed + '\` as date)'])
   // whereRaw('date_format(l.detectionTime, \'%Y-%m-%d %H:%i\') between ? and ?', ['cast(\`' + sd + '\` as date)', 'cast(\`' + ed + '\` as date)'])
   //date_format(detectionTime, '%Y-%m-%d') between cast('2020-9-19' as date) and cast('2020-9-19' as date)
