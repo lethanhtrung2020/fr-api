@@ -12,8 +12,8 @@ export default async (req, res) => {
   // console.log('sd: ' +  (sd === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(sd).format('DD-MM-YYYY hh:mm')) + ' -  ed: ' +  (ed === '' ? moment().format('DD-MM-YYYY hh:mm') : moment(ed).format('DD-MM-YYYY hh:mm')));
   // , \'%Y-%m-%d\'
   const offset = (page-1)*pageSize
-  console.log('sd: ' +  ed.toString()  === '' ? moment().subtract(7, 'days').format('YYYY-MM-DD 00:00') : ed.toString());
-  console.log('ed: ' +  ed.toString()  === '' ? moment().format('YYYY-MM-DD 00:00') : ed.toString());
+  console.log('sd: ' +  moment().subtract(7, 'days').format('YYYY-MM-DD 00:00'));
+  console.log('ed: ' +  moment().format('YYYY-MM-DD 00:00'));
   const lstReports = await knex.select("l.*", "u.name", "u.icCard", "u.phone", "d.block_id", "d.company_id", "d.floor_id", "d.site_id", "d.type as dev_type", "d.custom_name as dev_name", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
   .from("detection_logs as l")
   
