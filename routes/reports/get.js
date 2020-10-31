@@ -6,8 +6,9 @@ export default async (req, res) => {
   const {device, type='', sd='', ed='', temp = '', site='', block='', floor='', comp='', page=1, pageSize=15 } = req.query
   validateParams({  device })
   const offset = (page-1)*pageSize
-  const  strSD = !sd ? moment().subtract(7, 'days').format('YYYY-MM-DD 00:00') : sd;
+  const  strSD = !sd ? moment().subtract(6, 'days').format('YYYY-MM-DD 00:00') : sd;
   const  strED = !ed ? moment().format('YYYY-MM-DD 00:00') : sd;
+  console.log('ED:  ' +  strED + 'SD:  ' +  strSD);
   const lstReports = await knex.select("l.*", "u.name", "u.icCard", "u.phone", "d.block_id", "d.company_id", "d.floor_id", "d.site_id", "d.type as dev_type", "d.custom_name as dev_name", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
   .from("detection_logs as l")
   
