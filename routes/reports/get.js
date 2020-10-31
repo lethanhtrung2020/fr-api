@@ -6,7 +6,7 @@ export default async (req, res) => {
   validateParams({  device })
   // console.log('dt: ' + new Date('2020-09-20 11:31:21').toDateString() + ' - startDate: ' + new Date(sd === '' ? new Date() : sd.toString()).toDateString() + ' - endDate: ' +  new Date(ed === '' ? new Date() : ed.toString()).toDateString());
   // console.log('compare: ' +  new Date('2020-10-20 11:31:21').toDateString() === new Date(sd === '' ? new Date() : sd.toString()).toDateString());
-  // console.log('dt: ' +  moment());
+  console.log('dt: ' +  moment());
   // , \'%Y-%m-%d\'
   const offset = (page-1)*pageSize
 
