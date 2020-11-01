@@ -8,7 +8,6 @@ export default async (req, res) => {
     .leftJoin("blocks", "blocks.short_name", "devices.block_id")
     .leftJoin("sites", "sites.short_name", "devices.site_id")
     .leftJoin("floors", "floors.short_name", "devices.floor_id")
-    .leftJoin("companies", "companies.short_name", "devices.company_id")
   if (deviceIds) {
     const ids = deviceIds.split(",")
     query = query.whereIn("devices.name", ids)
