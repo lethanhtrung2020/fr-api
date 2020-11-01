@@ -1,5 +1,6 @@
 import knex from "knex";
 import setupPaginator from "knex-paginator";
+import moment from 'moment';
 
 const connection = {
   host: "localhost",
@@ -13,7 +14,7 @@ const connection = {
         return moment(field.string()).format('YYYY-MM-DD');
      }
      return next();
-   }  
+   }
 };
 
 const queryBuilder = knex({
