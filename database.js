@@ -8,6 +8,12 @@ const connection = {
   password: "123456!@",
   database: "fr_db",
   insecureAuth : true
+  typeCast: function (field, next) {
+  if (field.type == 'DATE') {
+        return moment(field.string()).format('YYYY-MM-DD');
+     }
+     return next();
+   }
 };
 
 const queryBuilder = knex({
