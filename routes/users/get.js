@@ -21,7 +21,7 @@ export default async (req, res) => {
   .leftJoin("sites as s", function() {
     this.on("s.short_name", "=", "u.site_id")
   })
-  .where('u.sn', device).where('u.site_id', 'like', `%${site}%`).where('u.block_id', 'like', `%${block}%`).where('u.floor_id', 'like', `%${floor}%`).where('u.company_id', 'like', `%${comp}%`).where(knex.raw('DATEDIFF(`u.icCard_Expiry`, now())>0')).offset(offset).limit(pageSize);
+  .where('u.sn', device).where('u.site_id', 'like', `%${site}%`).where('u.block_id', 'like', `%${block}%`).where('u.floor_id', 'like', `%${floor}%`).where('u.company_id', 'like', `%${comp}%`).where(knex.raw('DATEDIFF(u.icCard_Expiry, now())>0')).offset(offset).limit(pageSize);
 
   return res.success(lstUsers)
 }
