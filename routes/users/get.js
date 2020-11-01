@@ -7,7 +7,7 @@ export default async (req, res) => {
   const offset = (page-1)*pageSize
 
   // const users = await knex('users').where('sn', device).offset(offset).limit(pageSize).select()
-  const lstUsers = await knex.select("u.*,DATE_FORMAT(icCard_Expiry, '%Y-%m-%d') AS fin_exp_date", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
+  const lstUsers = await knex.select("u.*","DATE_FORMAT(icCard_Expiry, '%Y-%m-%d') AS fin_exp_date", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
   .from("users as u")
   .leftJoin("blocks as b", function() {
     this.on("b.short_name", "=", "u.block_id")
