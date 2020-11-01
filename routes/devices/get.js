@@ -21,12 +21,10 @@ export default async (req, res) => {
     "devices.block_id",
     "devices.site_id",
     "devices.floor_id",
-    "devices.company_id",
     "devices.custom_name",
     "blocks.name as blockName",
     "sites.name as siteName",
     "floors.name as floorName",
-    "companies.name as companyName"
   )
 
   return res.success(devices);
