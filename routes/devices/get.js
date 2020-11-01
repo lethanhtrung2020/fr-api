@@ -16,6 +16,7 @@ export default async (req, res) => {
 
   const devices = await query.offset(offset).limit(pageSize).select(
     "devices.id",
+	"devices.type",
     "devices.name",
     "devices.display_name",
     "devices.block_id",
