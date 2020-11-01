@@ -13,5 +13,6 @@ export default async (req, res) => {
       await knex('devices').where({ id }).update({ active: 0 });
     }
   });
-  return res.success('OK');
+  const devices = await knex.select('id', 'name', 'active').table('devices').where('active',0);
+  return res.success(devices);
 };
