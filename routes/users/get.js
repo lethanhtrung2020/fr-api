@@ -5,7 +5,9 @@ export default async (req, res) => {
   const { device, site='', block='', floor='', comp='', page=1, pageSize=15 } = req.query
   validateParams({  device })
   const offset = (page-1)*pageSize
-
+  const date_diff = %${fin_month}% * 30;
+  const sfilter = 'DATEDIFF(u.icCard_Expiry, now())>' . date_diff
+  
   // const users = await knex('users').where('sn', device).offset(offset).limit(pageSize).select()
   const lstUsers = await knex.select("u.*", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
   .from("users as u")
@@ -21,7 +23,7 @@ export default async (req, res) => {
   .leftJoin("sites as s", function() {
     this.on("s.short_name", "=", "u.site_id")
   })
-  .where('u.sn', device).where('u.site_id', 'like', `%${site}%`).where('u.block_id', 'like', `%${block}%`).where('u.floor_id', 'like', `%${floor}%`).where('u.company_id', 'like', `%${comp}%`).where(knex.raw('DATEDIFF(u.icCard_Expiry, now())>0')).offset(offset).limit(pageSize);
+  .where('u.sn', device).where('u.site_id', 'like', `%${site}%`).where('u.block_id', 'like', `%${block}%`).where('u.floor_id', 'like', `%${floor}%`).where('u.company_id', 'like', `%${comp}%`).where(knex.raw(sfilter)).offset(offset).limit(pageSize);
 
   return res.success(lstUsers)
 }
