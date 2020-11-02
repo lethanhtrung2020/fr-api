@@ -25,7 +25,7 @@ export default async (req, res) => {
     "blocks.name as blockName",
     "sites.name as siteName",
     "floors.name as floorName",
-  ).where('sites.active', '=', 1).where('blocks.active', '=', 1)where('floors.active', '=', 1)
+  ).where('sites.active', '=', 1).where('blocks.active', '=', 1).where('floors.active', '=', 1)
 
   return res.success(devices);
 };
