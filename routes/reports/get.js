@@ -14,7 +14,7 @@ export default async (req, res) => {
   
   .leftJoin("users as u", function() {
     this.on("l.userId", "u.userId"),
-    this.on("u.sn", device),
+    this.on("u.sn", device.toString()),
     this.on("u.active", 1)
   })
   .leftJoin("devices as d", function() {
