@@ -14,6 +14,7 @@ export default async (req, res) => {
   
   .leftJoin("users as u", function() {
     this.on("l.userId", "u.userId"),
+    this.on("u.sn", device),
     this.on("u.active", 1)
   })
   .leftJoin("devices as d", function() {
@@ -36,7 +37,7 @@ export default async (req, res) => {
     this.on("s.short_name", "d.site_id"),
     this.on("s.active", 1)
   })
-  .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).whereRaw('date_format(detectionTime, \'%Y-%m-%d  %H:%i\') between cast(\''+strSD.toString()+'\' as date) and cast(\''+strED.toString()+'\' as date)').orderBy('l.detectionTime', 'desc;').offset(offset);
+  .where('l.type', 'like', `%${String(type).toUpperCase()}%`).where('l.fromDevice', device).where('d.site_id', 'like', `%${site}%`).where('d.block_id', 'like', `%${block}%`).where('d.floor_id', 'like', `%${floor}%`).where('d.company_id', 'like', `%${comp}%`).whereRaw('date_format(detectionTime, \'%Y-%m-%d  %H:%i\') between cast(\''+strSD.toString()+'\' as datetime) and cast(\''+strED.toString()+'\' as datedatetime)').orderBy('l.detectionTime', 'desc;').offset(offset);
   return res.success(lstReports)
 }
 
