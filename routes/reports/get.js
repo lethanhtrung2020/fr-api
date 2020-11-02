@@ -3,7 +3,7 @@ import moment from 'moment'
 import { BadRequestError } from '@helpers/errors'
 
 export default async (req, res) => {
-  const {type='', gate='', site='', block='', floor='', comp='', sd='', ed='', temp = '', page=1, pageSize=15 } = req.query
+  const {device, type='', gate='', site='', block='', floor='', comp='', sd='', ed='', temp = '', page=1, pageSize=15 } = req.query
   validateParams({  device })
   const offset = (page-1)*pageSize
   const  strSD = !sd ? moment().subtract(6, 'days').format('YYYY-MM-DD 00:00') : sd;
