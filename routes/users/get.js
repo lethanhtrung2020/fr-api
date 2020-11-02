@@ -5,7 +5,7 @@ export default async (req, res) => {
   const { device, site='', block='', floor='', comp='', fin_month = 0, page=1, pageSize=15 } = req.query
   validateParams({  device })
   const offset = (page-1)*pageSize
-  const date_diff = fin_month * 30;
+  const date_diff = fin_month ==0 ? 10000000 : fin_month * 30;
   
   // const users = await knex('users').where('sn', device).offset(offset).limit(pageSize).select()
   const lstUsers = await knex.select("u.*", "b.name as block_name", "c.name as company_name", "f.name as floor_name", "s.name as site_name")
