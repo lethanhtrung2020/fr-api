@@ -3,7 +3,7 @@ import moment from 'moment'
 import { BadRequestError } from '@helpers/errors'
 
 export default async (req, res) => {
-  const {device, type='', sd='', ed='', temp = '', site='', block='', floor='', comp='', page=1, pageSize=15 } = req.query
+  const {type='', gate='', site='', block='', floor='', comp='', sd='', ed='', temp = '', page=1, pageSize=15 } = req.query
   validateParams({  device })
   const offset = (page-1)*pageSize
   const  strSD = !sd ? moment().subtract(6, 'days').format('YYYY-MM-DD 00:00') : sd;
@@ -14,7 +14,6 @@ export default async (req, res) => {
   
   .leftJoin("users as u", function() {
     this.on("l.userId", "u.userId"),
-    // this.on("u.sn", device.toString()),
     this.on("u.active", 1)
   })
   .leftJoin("devices as d", function() {
