@@ -5,7 +5,7 @@ export default async (req, res) => {
   const { device, site='', block='', floor='', comp='', fin_month = 0, page=1, pageSize=15 } = req.query
   validateParams({  device })
   const offset = (page-1)*pageSize
-  const date_diff = %${fin_month}% * 30;
+  const date_diff = fin_month * 30;
   const sfilter = 'DATEDIFF(u.icCard_Expiry, now())>' . date_diff
   
   // const users = await knex('users').where('sn', device).offset(offset).limit(pageSize).select()
