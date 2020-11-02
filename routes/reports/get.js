@@ -5,6 +5,7 @@ import { BadRequestError } from '@helpers/errors'
 export default async (req, res) => {
   const {device, type='', gate='', site='', block='', floor='', comp='', sd='', ed='', temp = '', page=1, pageSize=15 } = req.query
   validateParams({  device })
+  console.log('device: ' + device + ' - site: ' + site + ' - block: ' + block + ' - floor: ' + floor + ' - comp: ' + comp + ' - sd: ' + sd + ' - ed: ' + ed);
   const offset = (page-1)*pageSize
   const  strSD = !sd ? moment().subtract(6, 'days').format('YYYY-MM-DD 00:00') : sd;
   const  strED = !ed ? moment().format('YYYY-MM-DD 23:59') : ed;
