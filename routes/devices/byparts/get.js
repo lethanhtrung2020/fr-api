@@ -2,13 +2,17 @@ import knex from '@api/database.js'
 
 export default async (req, res) => {
   const { bId = '', cId = '', fId = '', sId = '' } = req.query;
-  // console.log('sId: ' + sId.toString());
-  const devices = await knex('devices')
-    .whereRaw('block_id = ?', [bId])
-    .whereRaw('company_id = ?', [cId])
-    .whereRaw('floor_id = ?', [fId])
-    .whereRaw('site_id = ?', sId.toString())
-    .andWhere('active',  1)
+  // , b: 'table'
+  // aTitle: 'a.title', // bTitle: 'b.title'
+  const devices = await knex({ d: 'devices' })
+  .select('*')
+  .whereRaw('?? = ??', ['d.site_id', sId.toString()])
+  // const devices = await knex('devices')
+  //   .whereRaw('block_id = ?', [bId])
+  //   .whereRaw('company_id = ?', [cId])
+  //   .whereRaw('floor_id = ?', [fId])
+  //   .whereRaw('site_id = ?', [sId.toString()])
+  //   .andWhere('active',  1)
   // .join(knex.raw('natural full join blocks')).where('short_name', bId).andWhere().andWhere('active',  1)
   // let query = knex("d.*")
   //   .from("devices as d")
