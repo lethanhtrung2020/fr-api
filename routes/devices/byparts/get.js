@@ -6,6 +6,10 @@ export default async (req, res) => {
   // aTitle: 'a.title', // bTitle: 'b.title'
   const devices = await knex({ d: 'devices' })
   .select('*')
+  .where('d.active',  1)
+  .whereRaw('d.block_id = ?', [bId.toString()])
+  .whereRaw('d.company_id = ?', [cId.toString()])
+  .whereRaw('d.floor_id = ?', [fId.toString()])
   .whereRaw('d.site_id = ?', [sId.toString()])
   // const devices = await knex('devices')
   //   .whereRaw('block_id = ?', [bId])
