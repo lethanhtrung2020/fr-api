@@ -3,10 +3,10 @@ import knex from '@api/database.js'
 export default async (req, res) => {
   const { bId = '', cId = '', fId = '', sId = '' } = req.query;
   const devices = await knex('devices')
-    .whereDraw('block_id = ?', [bId])
-    .whereDraw('company_id = ?', [cId])
-    .whereDraw('floor_id = ?', [fId])
-    .whereDraw('site_id = ?', [sId])
+    .whereRaw('block_id = ?', [bId])
+    .whereRaw('company_id = ?', [cId])
+    .whereRaw('floor_id = ?', [fId])
+    .whereRaw('site_id = ?', [sId])
     .andWhere('active',  1)
   // .join(knex.raw('natural full join blocks')).where('short_name', bId).andWhere().andWhere('active',  1)
   // let query = knex("d.*")
