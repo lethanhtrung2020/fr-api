@@ -4,10 +4,18 @@ export default async (req, res) => {
   const { bId = '', cId = '', fId = '', sId = '' } = req.query;
   // , b: 'table'
   // aTitle: 'a.title', // bTitle: 'b.title'
-  const devices = await knex({ d: 'devices' })
-  .select('*')
-  .where('d.active',  1)
-  .whereRaw('d.site_id = ?', [sId.toString()])
+  var sQuery = 'select * from devices as d where '
+    + (!bId ? '' : 'block_id = ' + bId)
+    + (!cId ? '' : !bId ? 'company_Id = ' +  cId : 'and company_id = ' + cId)
+    + (!fId ? '' : !bId || !cId ? 'floor_Id = ' +  fId : 'and floor_id = ' + fId);
+    + (!sId ? '' : !bId || !cId || !fId ? 'site_Id = ' +  sId : 'and site_id = ' + sId);
+  console.log('sQuery: ' + sQuery);
+  const devices = await knex.raw(sQuery) + ''
+  // knex({ d: 'devices' })
+  // .select('*')
+  // .where('d.active',  1)
+  // .whereRaw('d.site_id = ?', [sId.toString()])
+
   // const devices = await knex('devices')
   //   .whereRaw('block_id = ?', [bId])
   //   .whereRaw('company_id = ?', [cId])
