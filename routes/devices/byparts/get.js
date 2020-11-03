@@ -3,10 +3,15 @@ import knex from '@api/database.js'
 export default async (req, res) => {
   const { bId = '', cId = '', fId = '', sId = '' } = req.query;
   
-  const devices = await knex({ d: 'devices' })
-  .select('*')
-  .where('d.active',  1)
-  .whereRaw('d.site_id = ?', [sId.toString()])
+  const devices = await knex('devices')
+  .where(knex.raw('active = ?', 1))
+  .orWhere(knex.raw('LOWER("block_id") = ?', bId))
+  .orWhere(knex.raw('LOWER("floor_id") = ?', fId))
+  .orWhere(knex.raw('LOWER("site_id") = ?', sId))
+  // knex({ d: 'devices' })
+  // .select('*')
+  // .where('d.active',  1)
+  // .whereRaw('d.site_id = ?', [sId.toString()])
 
   // const devices = await knex('devices')
   //   .whereRaw('block_id = ?', [bId])
