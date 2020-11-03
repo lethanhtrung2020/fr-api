@@ -3,7 +3,7 @@ import knex from '@api/database.js'
 export default async (req, res) => {
   const { bId = '', cId = '', fId = '', sId = '' } = req.query;
   
-  knex({ d: 'devices' })
+  const devices = await knex({ d: 'devices' })
   .select('*')
   .where('d.active',  1)
   .whereRaw('d.site_id = ?', [sId.toString()])
